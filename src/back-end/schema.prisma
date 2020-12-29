@@ -8,11 +8,12 @@ generator client {
 }
 
 model User {
-  id           String    @id @default(cuid())
-  email        String
-  password     String
-  display_name String
-  comments     Comment[]
+  id                    String    @id @default(cuid())
+  email                 String
+  password              String
+  display_name          String
+  current_refresh_token String?
+  comments              Comment[]
 }
 
 model Comment {
