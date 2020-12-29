@@ -1,6 +1,5 @@
 import { prisma } from "back-end";
 import * as TE from "fp-ts/lib/TaskEither";
-import * as E from "fp-ts/lib/Either";
 import * as NA from "fp-ts/lib/NonEmptyArray";
 import { flow, pipe } from "fp-ts/lib/function";
 import * as M from "utils/messages";
