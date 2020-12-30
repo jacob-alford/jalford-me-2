@@ -1,3 +1,4 @@
+import { Request, Response, NextFunction } from "express";
 import { pipe, flow } from "fp-ts/lib/function";
 import * as E from "fp-ts/lib/Either";
 import * as TE from "fp-ts/lib/TaskEither";
@@ -148,4 +149,29 @@ export const liftResponseH = <H, R>(
     decodeHeaders(dh, flow(D.draw, M.malformedInputError("Malformed request body"))),
     TE.fromEither,
     TE.chain(({ headers }) => f(headers.processed))
+  );
+
+export const bhpFromRequest = <B, H, P>(
+  req: Request
+): BHP<KN.Knowledge<B>, KN.Knowledge<H>, KN.Knowledge<P>> => ({
+  body: KN.unknown(req.body as unknown),
+  headers: KN.unknown(req.headers as unknown),
+  params: KN.unknown(req.params)
+});
+
+export const toRequestHandler = <A, B = unknown, H = unknown, P = unknown>(
+  handler: (
+    bhp: BHP<KN.Knowledge<B>, KN.Knowledge<H>, KN.Knowledge<P>>
+  ) => TE.TaskEither<M.JAError, M.JASuccess<A>>
+) => async (req: Request, res: Response, next: NextFunction): Promise<void> =>
+  pipe(
+    await pipe(bhpFromRequest<B, H, P>(req), handler)(),
+    E.fold(
+      err => next(err),
+      data => {
+        res.status(data.status_number);
+        res.send(data);
+        next();
+      }
+    )
   );
