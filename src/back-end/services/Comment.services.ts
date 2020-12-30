@@ -5,7 +5,7 @@ import { flow, pipe } from "fp-ts/lib/function";
 import * as M from "utils/messages";
 import { CreateComment, Comment } from "models/Comment";
 
-export const CREATE = (user_id: string, post_id: string, comment: CreateComment) =>
+export const create = (user_id: string, post_id: string, comment: CreateComment) =>
   pipe(
     TE.tryCatchK(
       () =>
@@ -21,7 +21,7 @@ export const CREATE = (user_id: string, post_id: string, comment: CreateComment)
     )
   );
 
-export const READ = (
+export const getAllByPostId = (
   post_id: string
 ): TE.TaskEither<M.JAError, M.JASuccess<NA.NonEmptyArray<Comment>>> =>
   pipe(
@@ -44,7 +44,7 @@ export const READ = (
     TE.map(M.successfulCreate(`Successfully retrieved comments for post_id: ${post_id}`))
   );
 
-export const DELETE = (
+export const deleteById = (
   comment_id: string
 ): TE.TaskEither<M.JAError, M.JASuccess<Comment>> =>
   pipe(

@@ -5,7 +5,7 @@ import { prisma } from "back-end";
 import * as M from "utils/messages";
 import { CreateUser, UpdateUser, User } from "models/User";
 
-export const CREATE = (user: CreateUser): TE.TaskEither<M.JAError, M.JASuccess<User>> =>
+export const create = (user: CreateUser): TE.TaskEither<M.JAError, M.JASuccess<User>> =>
   pipe(
     user,
     TE.tryCatchK(
@@ -15,7 +15,7 @@ export const CREATE = (user: CreateUser): TE.TaskEither<M.JAError, M.JASuccess<U
     TE.map(M.successfulCreate(`Successfully created user with email: ${user}`))
   );
 
-export const READ = (user_id: string): TE.TaskEither<M.JAError, M.JASuccess<User>> =>
+export const getByID = (user_id: string): TE.TaskEither<M.JAError, M.JASuccess<User>> =>
   pipe(
     user_id,
     TE.tryCatchK(
@@ -36,7 +36,7 @@ export const READ = (user_id: string): TE.TaskEither<M.JAError, M.JASuccess<User
     TE.map(M.successfulRead(`Successfully retrieved user with id: ${user_id}`))
   );
 
-export const UPDATE = (
+export const updateById = (
   user_id: string,
   data: UpdateUser
 ): TE.TaskEither<M.JAError, M.JASuccess<User>> =>
@@ -49,7 +49,9 @@ export const UPDATE = (
     TE.map(M.successfulUpdate(`Successfully updated user with id: ${user_id}`))
   );
 
-export const DELETE = (user_id: string): TE.TaskEither<M.JAError, M.JASuccess<User>> =>
+export const deleteById = (
+  user_id: string
+): TE.TaskEither<M.JAError, M.JASuccess<User>> =>
   pipe(
     user_id,
     TE.tryCatchK(

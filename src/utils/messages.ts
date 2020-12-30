@@ -1,8 +1,9 @@
 import * as D from "io-ts/lib/Decoder";
+import * as H from "hyper-ts";
 
 type ErrorCodes = "INTERNAL" | "UNAUTHORIZED" | "MALFORMED_INPUT";
 
-type StatusNumbers = 500 | 401 | 400;
+type StatusNumbers = H.Status;
 
 export interface JAError {
   status_code: ErrorCodes;
@@ -45,11 +46,9 @@ type SuccessCodes =
   | "SUCCESSFUL_UPDATE"
   | "SUCCESSFUL_DELETE";
 
-type SuccessNumbers = 200 | 201;
-
 export interface JASuccess<A> {
   status_code: SuccessCodes;
-  status_number: SuccessNumbers;
+  status_number: StatusNumbers;
   message: string;
   data: A;
 }
