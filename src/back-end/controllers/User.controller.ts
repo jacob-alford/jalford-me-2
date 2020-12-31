@@ -1,15 +1,13 @@
-import * as D from "io-ts/lib/Decoder";
-import { pipe } from "fp-ts/lib/function";
-import { decodeCreateUser } from "models/User";
+import * as TE from "fp-ts/lib/TaskEither";
+import { flow } from "fp-ts/lib/function";
+import * as U from "models/User";
 import * as US from "back-end/services/User.services";
-import * as BHP from "utils/bhp";
+import { makeRequestHandler } from "utils/makeRequestHandler";
+import { decodeBody } from "utils/ReqArgs";
 
-export const USER_GET = pipe(
-  BHP.liftResponseP(({ user_id }) => US.getByID(user_id), D.type({ user_id: D.string })),
-  BHP.toRequestHandler
-);
-
-export const USER_POST = pipe(
-  BHP.liftResponseB(US.create, decodeCreateUser),
-  BHP.toRequestHandler
+export const USER_POST = makeRequestHandler(
+  flow(
+    decodeBody(U.decodeCreateUser),
+    TE.chain(({ body }) => US.create(body.processed))
+  )
 );
