@@ -5,12 +5,18 @@ import { BHPT } from "utils/BHPT";
 import * as M from "utils/messages";
 import * as Kn from "utils/knowledge";
 
-export type BHPTKn = BHPT<Kn.Unknown, Kn.Unknown, Kn.Unknown, Kn.Unknown>;
+export type BHPTUn = BHPT<Kn.Unknown, Kn.Unknown, Kn.Unknown, Kn.Unknown>;
+export type BHPTKn<Bo, Hd, Pm, Tk> = BHPT<
+  Kn.Knowledge<Bo>,
+  Kn.Knowledge<Hd>,
+  Kn.Knowledge<Pm>,
+  Kn.Knowledge<Tk>
+>;
 
 export const makeRequestHandler = <A>(
-  handler: (bhptkn: BHPTKn) => TE.TaskEither<M.JAError, M.JASuccess<A>>
+  handler: (bhptkn: BHPTUn) => TE.TaskEither<M.JAError, M.JASuccess<A>>
 ) => async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  const bhptkn: BHPTKn = {
+  const bhptkn: BHPTUn = {
     body: Kn.unknown(req.body),
     headers: Kn.unknown(req.headers),
     params: Kn.unknown(req.params),
