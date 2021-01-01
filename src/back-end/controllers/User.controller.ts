@@ -8,23 +8,38 @@ import * as RA from "utils/ReqArgs";
 
 export const USER_POST = makeRequestHandler(
   flow(
-    RA.decodeAuthHeaders,
-    TE.chain(RA.decodeBody(U.decodeCreateUser)),
+    RA.decodeBody(U.decodeCreateUser),
     TE.chain(({ body }) => US.create(body.value))
   )
 );
 
 export const USER_PUT = makeRequestHandler(
   flow(
-    RA.decodeBody(U.decodeUpdateUser),
+    RA.decodeAuthHeaders,
+    TE.chain(RA.decodeJWT),
     TE.chain(RA.decodeParams(D.type({ user_id: D.string }))),
+    TE.chain(RA.decodeBody(U.decodeUpdateUser)),
+    TE.chain(
+      RA.authorizeToken(({ token, params }) => [
+        token.value.user_id === params.value.user_id,
+        "user_id found in token does not match that of request!"
+      ])
+    ),
     TE.chain(({ body, params }) => US.updateById(params.value.user_id, body.value))
   )
 );
 
 export const USER_DELETE = makeRequestHandler(
   flow(
-    RA.decodeParams(D.type({ user_id: D.string })),
+    RA.decodeAuthHeaders,
+    TE.chain(RA.decodeJWT),
+    TE.chain(RA.decodeParams(D.type({ user_id: D.string }))),
+    TE.chain(
+      RA.authorizeToken(({ token, params }) => [
+        token.value.user_id === params.value.user_id,
+        "user_id found in token does not match that of request!"
+      ])
+    ),
     TE.chain(({ params }) => US.deleteById(params.value.user_id))
   )
 );

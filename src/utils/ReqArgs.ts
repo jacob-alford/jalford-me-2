@@ -13,12 +13,14 @@ const SECRET_KEY = process.env.JWT_SECRET_KEY as string;
 
 export type ReqArgs<Bd, Hd, Pm, Tk> = TE.TaskEither<M.JAError, BHPT.BHPT<Bd, Hd, Pm, Tk>>;
 
-export const decodeBody = <Bd, Hd, Pm, Tk>(db: D.Decoder<unknown, Bd>) => ({
+export const decodeBody = <Nv, Hd = Kn.Unknown, Pm = Kn.Unknown, Tk = Kn.Unknown>(
+  db: D.Decoder<unknown, Nv>
+) => ({
   body,
   headers,
   params,
   token
-}: BHPT.BHPT<Kn.Unknown, Hd, Pm, Tk>): ReqArgs<Kn.Known<Bd>, Hd, Pm, Tk> =>
+}: BHPT.BHPT<Kn.Unknown, Hd, Pm, Tk>): ReqArgs<Kn.Known<Nv>, Hd, Pm, Tk> =>
   pipe(
     body.__UNSAFE__unknown,
     db.decode,
@@ -31,14 +33,16 @@ export const decodeBody = <Bd, Hd, Pm, Tk>(db: D.Decoder<unknown, Bd>) => ({
     TE.fromEither
   );
 
-export const decodeHeaders = <Bd, Hd, Pm, Tk>(dh: D.Decoder<unknown, Hd>) => ({
+export const decodeHeaders = <Nv, Bd = Kn.Unknown, Pm = Kn.Unknown, Tk = Kn.Unknown>(
+  dh: D.Decoder<unknown, Nv>
+) => ({
   body,
   headers,
   params,
   token
-}: BHPT.BHPT<Bd, Kn.Unknown, Pm, Tk>): ReqArgs<Bd, Kn.Known<Hd>, Pm, Tk> =>
+}: BHPT.BHPT<Bd, Kn.Unknown, Pm, Tk>): ReqArgs<Bd, Kn.Known<Nv>, Pm, Tk> =>
   pipe(
-    headers,
+    headers.__UNSAFE__unknown,
     dh.decode,
     E.bimap(
       flow(D.draw, M.malformedInputError("Unexpected malformed headers")),
@@ -50,6 +54,18 @@ export const decodeHeaders = <Bd, Hd, Pm, Tk>(dh: D.Decoder<unknown, Hd>) => ({
       })
     ),
     TE.fromEither
+  );
+
+const jwtIsValid = (jwt: string): boolean =>
+  pipe(
+    jwt.split("."),
+    a =>
+      a.length === 3 &&
+      pipe(
+        a,
+        A.map(part => /^[a-zA-Z0-9]*$/g.test(part)),
+        b => b.every(identity)
+      )
   );
 
 const decodeHeadersWithAuthorization: D.Decoder<unknown, AuthorizedHeaders> = D.type({
@@ -67,11 +83,16 @@ const decodeHeadersWithAuthorization: D.Decoder<unknown, AuthorizedHeaders> = D.
                 pipe(
                   authParts,
                   A.lookup(1),
-                  O.map(token => bearer === "Bearer")
+                  O.chain(
+                    O.fromPredicate(token => bearer === "Bearer" && jwtIsValid(token))
+                  )
                 )
               )
             ),
-          O.fold(() => false, identity)
+          O.fold(
+            () => false,
+            () => true
+          )
         ),
       "Bearer Auth"
     )
@@ -80,14 +101,16 @@ const decodeHeadersWithAuthorization: D.Decoder<unknown, AuthorizedHeaders> = D.
 
 export const decodeAuthHeaders = decodeHeaders(decodeHeadersWithAuthorization);
 
-export const decodeParams = <Bd, Hd, Pm, Tk>(dp: D.Decoder<unknown, Pm>) => ({
+export const decodeParams = <Nv, Bd = Kn.Unknown, Hd = Kn.Unknown, Tk = Kn.Unknown>(
+  dp: D.Decoder<unknown, Nv>
+) => ({
   body,
   headers,
   params,
   token
-}: BHPT.BHPT<Bd, Hd, Kn.Unknown, Tk>): ReqArgs<Bd, Hd, Kn.Known<Pm>, Tk> =>
+}: BHPT.BHPT<Bd, Hd, Kn.Unknown, Tk>): ReqArgs<Bd, Hd, Kn.Known<Nv>, Tk> =>
   pipe(
-    params,
+    params.__UNSAFE__unknown,
     dp.decode,
     E.bimap(
       flow(D.draw, M.malformedInputError("Unexpected malformed parameters")),
@@ -101,13 +124,13 @@ export const decodeParams = <Bd, Hd, Pm, Tk>(dp: D.Decoder<unknown, Pm>) => ({
     TE.fromEither
   );
 
-export const decodeToken = <Bd, Hd, Pm, Tk>(
+export const decodeToken = <Nv, Bd, Hd, Pm>(
   getTokenData: (
     bhpt: BHPT.BHPT<Bd, Kn.Known<Hd>, Pm, Kn.Unknown>
-  ) => TE.TaskEither<string, Kn.Knowledge<Tk>>
-) => (dt: D.Decoder<unknown, Tk>) => (
+  ) => TE.TaskEither<string, Kn.Knowledge<Nv>>
+) => (dt: D.Decoder<unknown, Nv>) => (
   bhpt: BHPT.BHPT<Bd, Kn.Known<Hd>, Pm, Kn.Unknown>
-): ReqArgs<Bd, Kn.Known<Hd>, Pm, Kn.Known<Tk>> =>
+): ReqArgs<Bd, Kn.Known<Hd>, Pm, Kn.Known<Nv>> =>
   pipe(
     getTokenData(bhpt),
     TE.mapLeft(M.unauthorizedError("Unauthorized")),
@@ -160,7 +183,7 @@ const decodeUserJWT: D.Decoder<unknown, UserJWT> = D.type({
   display_name: D.string
 });
 
-export const decodeJWT = decodeToken<unknown, AuthorizedHeaders, unknown, UserJWT>(
+export const decodeJWT = decodeToken<UserJWT, Kn.Unknown, AuthorizedHeaders, Kn.Unknown>(
   ({ headers }) =>
     pipe(verifyJWT(headers.value.Authorization, SECRET_KEY), TE.bimap(String, Kn.unknown))
 )(decodeUserJWT);
