@@ -21,7 +21,7 @@ export const USER_PUT = makeRequestHandler(
     TE.chain(RA.decodeBody(U.decodeUpdateUser)),
     TE.chain(
       RA.authorizeToken(({ token, params }) => [
-        token.value.user_id === params.value.user_id,
+        token.value.sub === params.value.user_id,
         "user_id found in token does not match that of request!"
       ])
     ),
@@ -36,7 +36,7 @@ export const USER_DELETE = makeRequestHandler(
     TE.chain(RA.decodeParams(D.type({ user_id: D.string }))),
     TE.chain(
       RA.authorizeToken(({ token, params }) => [
-        token.value.user_id === params.value.user_id,
+        token.value.sub === params.value.user_id,
         "user_id found in token does not match that of request!"
       ])
     ),

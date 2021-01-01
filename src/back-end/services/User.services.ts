@@ -27,7 +27,7 @@ export const getByID = (user_id: string): TE.TaskEither<M.JAError, M.JASuccess<U
         E.fromNullable(
           pipe(
             `Unknown user_id: ${user_id}`,
-            M.malformedInputError(`User with id: ${user_id} does not exist!`)
+            M.notFoundError(`User with id: ${user_id} does not exist!`)
           )
         ),
         TE.fromEither

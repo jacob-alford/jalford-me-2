@@ -1,7 +1,7 @@
 import * as D from "io-ts/lib/Decoder";
 import * as H from "hyper-ts";
 
-type ErrorCodes = "INTERNAL" | "UNAUTHORIZED" | "MALFORMED_INPUT";
+type ErrorCodes = "INTERNAL" | "UNAUTHORIZED" | "MALFORMED_INPUT" | "NOT_FOUND";
 
 type StatusNumbers = H.Status;
 
@@ -17,6 +17,13 @@ export const decodeJAError: D.Decoder<unknown, JAError> = D.type({
   status_number: D.literal(500, 401, 400),
   error: D.string,
   message: D.string
+});
+
+export const notFoundError = (message: string) => (error: string): JAError => ({
+  status_code: "NOT_FOUND",
+  status_number: 404,
+  error,
+  message
 });
 
 export const internalError = (message: string) => (error: string): JAError => ({

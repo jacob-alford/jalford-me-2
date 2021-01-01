@@ -163,13 +163,13 @@ interface AuthorizedHeaders {
 
 interface UserJWT {
   email: string;
-  user_id: string;
+  sub: string;
   display_name: string;
 }
 
 const decodeUserJWT: D.Decoder<unknown, UserJWT> = D.type({
   email: D.string,
-  user_id: D.string,
+  sub: D.string,
   display_name: D.string
 });
 

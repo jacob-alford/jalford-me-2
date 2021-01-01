@@ -12,8 +12,10 @@ export const decodeComment: D.Decoder<unknown, Comment> = D.type({
 
 export interface CreateComment {
   body: string;
+  user_id: string;
 }
 
 export const decodeCreateComment: D.Decoder<unknown, CreateComment> = D.type({
-  body: D.string
+  body: D.string,
+  user_id: D.string
 });
