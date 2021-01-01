@@ -47,8 +47,7 @@ export const COMMENT_DELETE = makeRequestHandler(
               "Comment.user_id does not match that found in token!"
             ])
           )
-        ),
-        TE.map(() => bhpt)
+        )
       )
     ),
     TE.chain(({ body, params }) => CS.deleteById(params.value.comment_id))
