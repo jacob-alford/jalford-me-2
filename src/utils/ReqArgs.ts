@@ -13,9 +13,7 @@ const SECRET_KEY = process.env.JWT_SECRET_KEY as string;
 
 export type ReqArgs<Bd, Hd, Pm, Tk> = TE.TaskEither<M.JAError, BHPT.BHPT<Bd, Hd, Pm, Tk>>;
 
-export const decodeBody = <Bd = unknown, Hd = unknown, Pm = unknown, Tk = unknown>(
-  db: D.Decoder<unknown, Bd>
-) => ({
+export const decodeBody = <Bd, Hd, Pm, Tk>(db: D.Decoder<unknown, Bd>) => ({
   body,
   headers,
   params,
@@ -33,9 +31,7 @@ export const decodeBody = <Bd = unknown, Hd = unknown, Pm = unknown, Tk = unknow
     TE.fromEither
   );
 
-export const decodeHeaders = <Bd = unknown, Hd = unknown, Pm = unknown, Tk = unknown>(
-  dh: D.Decoder<unknown, Hd>
-) => ({
+export const decodeHeaders = <Bd, Hd, Pm, Tk>(dh: D.Decoder<unknown, Hd>) => ({
   body,
   headers,
   params,
@@ -84,9 +80,7 @@ const decodeHeadersWithAuthorization: D.Decoder<unknown, AuthorizedHeaders> = D.
 
 export const decodeAuthHeaders = decodeHeaders(decodeHeadersWithAuthorization);
 
-export const decodeParams = <Bd = unknown, Hd = unknown, Pm = unknown, Tk = unknown>(
-  dp: D.Decoder<unknown, Pm>
-) => ({
+export const decodeParams = <Bd, Hd, Pm, Tk>(dp: D.Decoder<unknown, Pm>) => ({
   body,
   headers,
   params,
@@ -107,7 +101,7 @@ export const decodeParams = <Bd = unknown, Hd = unknown, Pm = unknown, Tk = unkn
     TE.fromEither
   );
 
-export const decodeToken = <Bd = unknown, Hd = unknown, Pm = unknown, Tk = unknown>(
+export const decodeToken = <Bd, Hd, Pm, Tk>(
   getTokenData: (
     bhpt: BHPT.BHPT<Bd, Kn.Known<Hd>, Pm, Kn.Unknown>
   ) => TE.TaskEither<string, Kn.Knowledge<Tk>>
@@ -116,7 +110,7 @@ export const decodeToken = <Bd = unknown, Hd = unknown, Pm = unknown, Tk = unkno
 ): ReqArgs<Bd, Kn.Known<Hd>, Pm, Kn.Known<Tk>> =>
   pipe(
     getTokenData(bhpt),
-    TE.mapLeft(M.internalError("Unable to decode user token!")),
+    TE.mapLeft(M.unauthorizedError("Unauthorized")),
     TE.chain(
       Kn.fold(
         TE.right,
@@ -135,7 +129,7 @@ export const decodeToken = <Bd = unknown, Hd = unknown, Pm = unknown, Tk = unkno
     }))
   );
 
-export const _decodeJWT: (
+export const verifyJWT: (
   token: string,
   secretKey: string,
   options?: jwt.VerifyOptions
@@ -168,13 +162,10 @@ const decodeUserJWT: D.Decoder<unknown, UserJWT> = D.type({
 
 export const decodeJWT = decodeToken<unknown, AuthorizedHeaders, unknown, UserJWT>(
   ({ headers }) =>
-    pipe(
-      _decodeJWT(headers.value.Authorization, SECRET_KEY),
-      TE.bimap(String, Kn.unknown)
-    )
+    pipe(verifyJWT(headers.value.Authorization, SECRET_KEY), TE.bimap(String, Kn.unknown))
 )(decodeUserJWT);
 
-export const authorizeToken = <Tk, Bd = unknown, Hd = unknown, Pm = unknown>(
+export const authorizeToken = <Tk, Bd, Hd, Pm>(
   validator: (bhpt: BHPT.BHPT<Bd, Hd, Pm, Kn.Known<Tk>>) => [boolean, string]
 ) => (bhpt: BHPT.BHPT<Bd, Hd, Pm, Kn.Known<Tk>>): ReqArgs<Bd, Hd, Pm, Kn.Known<Tk>> =>
   pipe(

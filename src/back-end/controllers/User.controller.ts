@@ -8,7 +8,8 @@ import * as RA from "utils/ReqArgs";
 
 export const USER_POST = makeRequestHandler(
   flow(
-    RA.decodeBody(U.decodeCreateUser),
+    RA.decodeAuthHeaders,
+    TE.chain(RA.decodeBody(U.decodeCreateUser)),
     TE.chain(({ body }) => US.create(body.value))
   )
 );
