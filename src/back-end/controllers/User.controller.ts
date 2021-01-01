@@ -16,7 +16,7 @@ export const USER_POST = makeRequestHandler(
 export const USER_PUT = makeRequestHandler(
   flow(
     RA.decodeAuthHeaders,
-    TE.chain(RA.decodeJWT),
+    TE.chain(RA.validateJwt),
     TE.chain(RA.decodeParams(D.type({ user_id: D.string }))),
     TE.chain(RA.decodeBody(U.decodeUpdateUser)),
     TE.chain(
@@ -32,7 +32,7 @@ export const USER_PUT = makeRequestHandler(
 export const USER_DELETE = makeRequestHandler(
   flow(
     RA.decodeAuthHeaders,
-    TE.chain(RA.decodeJWT),
+    TE.chain(RA.validateJwt),
     TE.chain(RA.decodeParams(D.type({ user_id: D.string }))),
     TE.chain(
       RA.authorizeToken(({ token, params }) => [

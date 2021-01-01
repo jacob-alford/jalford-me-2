@@ -56,17 +56,7 @@ export const decodeHeaders = <Nv, Bd = Kn.Unknown, Pm = Kn.Unknown, Tk = Kn.Unkn
     TE.fromEither
   );
 
-const jwtIsValid = (jwt: string): boolean =>
-  pipe(
-    jwt.split("."),
-    a =>
-      a.length === 3 &&
-      pipe(
-        a,
-        A.map(part => /^[a-zA-Z0-9]*$/g.test(part)),
-        b => b.every(identity)
-      )
-  );
+const jwtIsValid = (jwt: string): boolean => pipe(jwt.split("."), a => a.length === 3);
 
 const decodeHeadersWithAuthorization: D.Decoder<unknown, AuthorizedHeaders> = D.type({
   Authorization: pipe(
@@ -183,9 +173,23 @@ const decodeUserJWT: D.Decoder<unknown, UserJWT> = D.type({
   display_name: D.string
 });
 
-export const decodeJWT = decodeToken<UserJWT, Kn.Unknown, AuthorizedHeaders, Kn.Unknown>(
-  ({ headers }) =>
-    pipe(verifyJWT(headers.value.Authorization, SECRET_KEY), TE.bimap(String, Kn.unknown))
+export const validateJwt = decodeToken<
+  UserJWT,
+  Kn.Unknown,
+  AuthorizedHeaders,
+  Kn.Unknown
+>(({ headers }) =>
+  pipe(
+    verifyJWT(
+      pipe(
+        headers.value.Authorization.split(" "),
+        A.lookup(1),
+        O.fold(() => "", identity)
+      ),
+      SECRET_KEY
+    ),
+    TE.bimap(String, Kn.unknown)
+  )
 )(decodeUserJWT);
 
 export const authorizeToken = <Tk, Bd, Hd, Pm>(

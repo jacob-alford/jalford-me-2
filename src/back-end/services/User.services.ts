@@ -12,7 +12,7 @@ export const create = (user: CreateUser): TE.TaskEither<M.JAError, M.JASuccess<U
       data => prisma.user.create({ data }),
       flow(String, M.internalError(`Successfully created user with email: ${user.email}`))
     ),
-    TE.map(M.successfulCreate(`Successfully created user with email: ${user}`))
+    TE.map(M.successfulCreate(`Successfully created user with email: ${user.email}`))
   );
 
 export const getByID = (user_id: string): TE.TaskEither<M.JAError, M.JASuccess<User>> =>
