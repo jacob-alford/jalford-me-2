@@ -1,6 +1,7 @@
 import * as TE from "fp-ts/lib/TaskEither";
 import * as E from "fp-ts/lib/Either";
 import { flow, pipe } from "fp-ts/lib/function";
+import * as a2 from "argon2";
 import { prisma } from "back-end";
 import * as M from "utils/messages";
 import { CreateUser, UpdateUser, User } from "models/User";
@@ -9,8 +10,14 @@ export const create = (user: CreateUser): TE.TaskEither<M.JAError, M.JASuccess<U
   pipe(
     user,
     TE.tryCatchK(
-      data => prisma.user.create({ data }),
-      flow(String, M.internalError(`Successfully created user with email: ${user.email}`))
+      user => a2.hash(user.password, { type: a2.argon2id }),
+      flow(String, M.internalError("Unable to hash user password!"))
+    ),
+    TE.chain(
+      TE.tryCatchK(
+        password => prisma.user.create({ data: { ...user, password } }),
+        flow(String, M.internalError(`Unable to create user with email: ${user.email}`))
+      )
     ),
     TE.map(M.successfulCreate(`Successfully created user with email: ${user.email}`))
   );
