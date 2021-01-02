@@ -7,9 +7,9 @@ export const router = express
   /*
    * User Routes
    */
-  .post("/user", UC.USER_POST)
-  .put("/user/:user_id", UC.USER_PUT)
-  .delete("/user/:user_id", UC.USER_DELETE)
+  .post("/users", UC.USER_POST)
+  .put("/users/:user_id", UC.USER_PUT)
+  .delete("/users/:user_id", UC.USER_DELETE)
   /*
    * Comment Routes
    */

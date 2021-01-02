@@ -4,6 +4,7 @@ import { router } from "back-end/router";
 import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
+import * as H from "back-end/handlers";
 
 export const prisma = new PrismaClient();
 
@@ -16,4 +17,9 @@ export const app = express()
   )
   .use(helmet())
   .use(cors())
-  .use(router);
+  .use(H.loggerMiddleware())
+  .use("/health", H.healthHandler())
+  .use(router)
+  .use(H.errorHandler());
+
+app.listen(3000, () => console.log("App listening on port 3000"));

@@ -51,7 +51,8 @@ type SuccessCodes =
   | "SUCCESSFUL_CREATE"
   | "SUCCESSFUL_READ"
   | "SUCCESSFUL_UPDATE"
-  | "SUCCESSFUL_DELETE";
+  | "SUCCESSFUL_DELETE"
+  | "SUCCESS";
 
 export interface JASuccess<A> {
   status_code: SuccessCodes;
@@ -98,6 +99,13 @@ export const successfulRead = (message: string) => <A>(data: A): JASuccess<A> =>
 
 export const successfulDelete = (message: string) => <A>(data: A): JASuccess<A> => ({
   status_code: "SUCCESSFUL_DELETE",
+  status_number: 200,
+  message,
+  data
+});
+
+export const generalSuccess = (message: string) => <A>(data: A): JASuccess<A> => ({
+  status_code: "SUCCESS",
   status_number: 200,
   message,
   data

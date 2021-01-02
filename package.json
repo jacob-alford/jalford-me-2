@@ -36,10 +36,23 @@
     "web-vitals": "^0.2.4"
   },
   "scripts": {
+    "start:backend:dev": "nodemon -e ts --exec ts-node -r tsconfig-paths/register src/back-end",
+    "migrate:dev": "prisma migrate dev --preview-feature --schema src/back-end/schema.prisma",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "**/*.test.ts",
+      "**/*.spec.ts",
+      ".git",
+      "node_modules"
+    ],
+    "watch": [
+      "src"
+    ]
   },
   "eslintConfig": {
     "extends": [
@@ -60,6 +73,9 @@
     ]
   },
   "devDependencies": {
-    "@prisma/cli": "^2.13.1"
+    "@prisma/cli": "^2.13.1",
+    "nodemon": "^2.0.6",
+    "ts-node": "^9.1.1",
+    "tsconfig-paths": "^3.9.0"
   }
 }

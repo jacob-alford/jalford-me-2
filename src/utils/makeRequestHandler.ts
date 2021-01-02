@@ -28,5 +28,5 @@ export const makeRequestHandler = <A>(
     return;
   }
   res.status(result.right.status_number);
-  res.send(result.right);
+  res.json(result.right);
 };
