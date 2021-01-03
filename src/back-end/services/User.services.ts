@@ -1,4 +1,5 @@
 import * as TE from "fp-ts/lib/TaskEither";
+import * as T from "fp-ts/lib/Task";
 import * as E from "fp-ts/lib/Either";
 import { flow, pipe } from "fp-ts/lib/function";
 import * as a2 from "argon2";
@@ -41,6 +42,20 @@ export const getByID = (user_id: string): TE.TaskEither<M.JAError, M.JASuccess<U
       )
     ),
     TE.map(M.successfulRead(`Successfully retrieved user with id: ${user_id}`))
+  );
+
+export const findByEmail = (email: string): TE.TaskEither<M.JAError, User> =>
+  pipe(
+    T.fromTask(() => prisma.user.findFirst({ where: { email } })),
+    TE.fromTask,
+    TE.chain(
+      flow(
+        E.fromNullable(
+          M.unauthorizedError(`Not Found`)(`User with email: ${email} was not found!`)
+        ),
+        TE.fromEither
+      )
+    )
   );
 
 export const updateById = (

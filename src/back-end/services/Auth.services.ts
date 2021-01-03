@@ -4,6 +4,7 @@ import { sequenceT } from "fp-ts/lib/Apply";
 import * as D from "io-ts/lib/Decoder";
 import * as E from "fp-ts/lib/Either";
 import * as jwt from "jsonwebtoken";
+import * as a2 from "argon2";
 import { env } from "back-end/env";
 import * as U from "models/User";
 import * as US from "back-end/services/User.services";
@@ -59,21 +60,103 @@ const getPrivateKey = X.get(
   "Unexpected response format retrieving private key!"
 );
 
-export const VALIDATE_ID_TOKEN = (
-  id_token: string
-): TE.TaskEither<M.JAError, U.UserJWT> =>
+export const ID_TOKEN_EXPIRATION = "1h";
+export const REFRESH_TOKEN_EXPIRATION = "7d";
+
+export const VALIDATE_EMAIL_PASSWORD = (
+  email: string,
+  password: string
+): TE.TaskEither<M.JAError, U.PublicUser> =>
+  pipe(
+    US.findByEmail(email),
+    TE.mapLeft(() =>
+      M.unauthorizedError("Unauthorized")("Email or password doesn't match")
+    ),
+    TE.chain(user =>
+      pipe(
+        user,
+        TE.tryCatchK(
+          user => a2.verify(user.password, password, { type: a2.argon2id }),
+          flow(String, M.internalError("Error verifying password hash"))
+        ),
+        TE.chain(
+          TE.fromPredicate(identity, () =>
+            M.unauthorizedError("Unauthorized")("Email or password doesn't match")
+          )
+        ),
+        TE.map(() => user)
+      )
+    )
+  );
+
+export const VALIDATE_TOKEN = (token: string): TE.TaskEither<M.JAError, U.UserJWT> =>
   pipe(
     env.SIGNING_PUBLIC_KEY_URL,
     TE.chain(getPublicKey),
     TE.chain(publicKey =>
       pipe(
-        verifyJWT(id_token, publicKey),
+        verifyJWT(token, publicKey),
         TE.mapLeft(flow(String, M.unauthorizedError("Unauthorized"))),
         TE.chain(
           flow(
             U.decodeUserJWT.decode,
             E.mapLeft(flow(D.draw, M.unauthorizedError("Unexpected malformed token"))),
             TE.fromEither
+          )
+        )
+      )
+    )
+  );
+
+export const REFRESH_ID_TOKEN = (
+  user_id: string,
+  refresh_token: string
+): TE.TaskEither<M.JAError, Tokens> =>
+  pipe(
+    US.getByID(user_id),
+    TE.map(({ data }) => data),
+    TE.chain(user =>
+      pipe(
+        user.current_refresh_token,
+        E.fromNullable(
+          M.unauthorizedError("Unauthorized")("refresh_token does not match!")
+        ),
+        TE.fromEither,
+        TE.map(refresh_token => ({ ...user, current_refresh_token: refresh_token }))
+      )
+    ),
+    TE.chain(user =>
+      pipe(
+        user,
+        TE.tryCatchK(
+          ({ current_refresh_token }) => a2.verify(current_refresh_token, refresh_token),
+          flow(String, M.internalError("Unable to verify refresh_token"))
+        ),
+        TE.chain(
+          TE.fromPredicate(identity, () =>
+            M.unauthorizedError("Unauthorized")("refresh_token does not match!")
+          )
+        ),
+        TE.map(() => user)
+      )
+    ),
+    TE.chain(user =>
+      pipe(
+        VALIDATE_TOKEN(refresh_token),
+        TE.map(() => user)
+      )
+    ),
+    TE.chain(user =>
+      pipe(
+        GET_TOKENS(ID_TOKEN_EXPIRATION, REFRESH_TOKEN_EXPIRATION, user),
+        TE.chain(tokens =>
+          pipe(
+            US.updateById(user.id, {
+              email: user.email,
+              display_name: user.display_name,
+              current_refresh_token: tokens.refresh_token
+            }),
+            TE.map(() => tokens)
           )
         )
       )

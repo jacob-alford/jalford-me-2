@@ -5,6 +5,7 @@ import * as D from "io-ts/lib/Decoder";
 import * as A from "fp-ts/lib/Array";
 import * as O from "fp-ts/lib/Option";
 import * as jwt from "jsonwebtoken";
+import * as AS from "back-end/services/Auth.services";
 import * as BHPT from "utils/BHPT";
 import * as M from "utils/messages";
 import * as Kn from "utils/knowledge";
@@ -92,6 +93,15 @@ const decodeHeadersWithAuthorization: D.Decoder<unknown, AuthorizedHeaders> = D.
 
 export const decodeAuthHeaders = decodeHeaders(decodeHeadersWithAuthorization);
 
+interface EmailPassword {
+  email: string;
+  password: string;
+}
+
+export const decodeEmailPasswordHeaders = decodeHeaders<EmailPassword>(
+  D.type({ email: D.string, password: D.string })
+);
+
 export const decodeParams = <Nv, Bd = Kn.Unknown, Hd = Kn.Unknown, Tk = Kn.Unknown>(
   dp: D.Decoder<unknown, Nv>
 ) => ({
@@ -118,23 +128,12 @@ export const decodeParams = <Nv, Bd = Kn.Unknown, Hd = Kn.Unknown, Tk = Kn.Unkno
 export const decodeToken = <Nv, Bd, Hd, Pm>(
   getTokenData: (
     bhpt: BHPT.BHPT<Bd, Kn.Known<Hd>, Pm, Kn.Unknown>
-  ) => TE.TaskEither<string, Kn.Knowledge<Nv>>
-) => (dt: D.Decoder<unknown, Nv>) => (
+  ) => TE.TaskEither<M.JAError, Nv>
+) => (
   bhpt: BHPT.BHPT<Bd, Kn.Known<Hd>, Pm, Kn.Unknown>
 ): ReqArgs<Bd, Kn.Known<Hd>, Pm, Kn.Known<Nv>> =>
   pipe(
     getTokenData(bhpt),
-    TE.mapLeft(M.unauthorizedError("Unauthorized")),
-    TE.chain(
-      Kn.fold(
-        TE.right,
-        flow(
-          dt.decode,
-          E.mapLeft(flow(D.draw, M.malformedInputError("Unexpected malformed token"))),
-          TE.fromEither
-        )
-      )
-    ),
     TE.map(token => ({
       body: bhpt.body,
       headers: bhpt.headers,
@@ -156,17 +155,12 @@ export const validateJwt = decodeToken<
   Kn.Unknown
 >(({ headers }) =>
   pipe(
-    verifyJWT(
-      pipe(
-        headers.value.Authorization.split(" "),
-        A.lookup(1),
-        O.fold(() => "", identity)
-      ),
-      SECRET_KEY
-    ),
-    TE.bimap(String, Kn.unknown)
+    headers.value.Authorization.split(" "),
+    A.lookup(1),
+    O.fold(() => "", identity),
+    AS.VALIDATE_TOKEN
   )
-)(U.decodeUserJWT);
+);
 
 export const authorizeToken = <Tk, Bd, Hd, Pm>(
   validator: (bhpt: BHPT.BHPT<Bd, Hd, Pm, Kn.Known<Tk>>) => [boolean, string]

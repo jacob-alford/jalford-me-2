@@ -1,9 +1,15 @@
 import express from "express";
 import * as UC from "back-end/controllers/User.controller";
 import * as CC from "back-end/controllers/Comment.controller";
+import * as AC from "back-end/controllers/Auth.controller";
 
 export const router = express
   .Router()
+  /*
+   * Auth Routes
+   */
+  .post("/auth/login", AC.AUTH_LOGIN_POST)
+  .post("/auth/:user_id/refresh", AC.AUTH_REFRESH_TOKEN_POST)
   /*
    * User Routes
    */
