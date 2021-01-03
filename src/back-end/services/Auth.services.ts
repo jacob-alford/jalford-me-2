@@ -146,21 +146,7 @@ export const REFRESH_ID_TOKEN = (
         TE.map(() => user)
       )
     ),
-    TE.chain(user =>
-      pipe(
-        GET_TOKENS(ID_TOKEN_EXPIRATION, REFRESH_TOKEN_EXPIRATION, user),
-        TE.chain(tokens =>
-          pipe(
-            US.updateById(user.id, {
-              email: user.email,
-              display_name: user.display_name,
-              current_refresh_token: tokens.refresh_token
-            }),
-            TE.map(() => tokens)
-          )
-        )
-      )
-    )
+    TE.chain(user => GET_TOKENS(ID_TOKEN_EXPIRATION, REFRESH_TOKEN_EXPIRATION, user))
   );
 
 export const GET_TOKENS = (
