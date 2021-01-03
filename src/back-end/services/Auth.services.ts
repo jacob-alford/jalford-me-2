@@ -140,11 +140,6 @@ export const GET_TOKENS = (
 ): TE.TaskEither<M.JAError, Tokens> =>
   pipe(
     sequence(env.SIGNING_PRIVATE_KEY, env.SIGNING_PRIVATE_KEY_PASSPHRASE),
-    TE.map(stuff => {
-      console.log(stuff[0]);
-      console.log(stuff[1]);
-      return stuff;
-    }),
     TE.chain(([key, passphrase]) =>
       pipe(
         signJWT(
