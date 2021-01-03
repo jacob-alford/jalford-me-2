@@ -9,7 +9,6 @@ import { env } from "back-end/env";
 import * as U from "models/User";
 import * as US from "back-end/services/User.services";
 import * as M from "utils/messages";
-import * as X from "utils/X";
 
 const sequence = sequenceT(TE.taskEither);
 
@@ -31,12 +30,6 @@ export const verifyJWT: (
   ) => void
 );
 
-const getPublicKey = X.get(
-  D.string,
-  "Error retrieving public key!",
-  "Unexpected response format retrieving public key!"
-);
-
 interface KeyPassphrase {
   key: string;
   passphrase: string;
@@ -54,11 +47,8 @@ const signJWT: (
   ) => void
 );
 
-const getPrivateKey = X.get(
-  D.string,
-  "Error retrieving private key!",
-  "Unexpected response format retrieving private key!"
-);
+export const PUBLIC_KEY =
+  "ecdsa-sha2-nistp521 AAAAE2VjZHNhLXNoYTItbmlzdHA1MjEAAAAIbmlzdHA1MjEAAACFBAEIBEqq2tKC6Ghdu5SPs2bPY6nHuoDj+XFl9zzCxUr03+LY2YE7Bcouv2hDZg9S/Q9u4WRGa8KxxtYYOUeiy0PZRQAuN9pqZVqUCyDcN7DAh/798A91eTAc4o6JUTFOrDWGny/7xd4UcH+aySWkP6BBTK44WJQzaEVfNUVJk7UY+X03UQ== jacob@fl-69-69-0-198.dhcp.embarqhsd.net";
 
 export const ID_TOKEN_EXPIRATION = "1h";
 export const REFRESH_TOKEN_EXPIRATION = "7d";
@@ -91,19 +81,13 @@ export const VALIDATE_EMAIL_PASSWORD = (
 
 export const VALIDATE_TOKEN = (token: string): TE.TaskEither<M.JAError, U.UserJWT> =>
   pipe(
-    env.SIGNING_PUBLIC_KEY_URL,
-    TE.chain(getPublicKey),
-    TE.chain(publicKey =>
-      pipe(
-        verifyJWT(token, publicKey.replace(/\\n/gm, "\n")),
-        TE.mapLeft(flow(String, M.unauthorizedError("Unauthorized"))),
-        TE.chain(
-          flow(
-            U.decodeUserJWT.decode,
-            E.mapLeft(flow(D.draw, M.unauthorizedError("Unexpected malformed token"))),
-            TE.fromEither
-          )
-        )
+    verifyJWT(token, PUBLIC_KEY),
+    TE.mapLeft(flow(String, M.unauthorizedError("Unauthorized"))),
+    TE.chain(
+      flow(
+        U.decodeUserJWT.decode,
+        E.mapLeft(flow(D.draw, M.unauthorizedError("Unexpected malformed token"))),
+        TE.fromEither
       )
     )
   );
@@ -155,14 +139,12 @@ export const GET_TOKENS = (
   { email, display_name, id }: U.PublicUser
 ): TE.TaskEither<M.JAError, Tokens> =>
   pipe(
-    env.SIGNING_PRIVATE_KEY_URL,
-    TE.chain(getPrivateKey),
-    TE.chain(privateKey =>
-      sequence(
-        TE.right(privateKey) as TE.TaskEither<M.JAError, string>,
-        env.SIGNING_PRIVATE_KEY_PASSPHRASE
-      )
-    ),
+    sequence(env.SIGNING_PRIVATE_KEY, env.SIGNING_PRIVATE_KEY_PASSPHRASE),
+    TE.map(stuff => {
+      console.log(stuff[0]);
+      console.log(stuff[1]);
+      return stuff;
+    }),
     TE.chain(([key, passphrase]) =>
       pipe(
         signJWT(
