@@ -95,7 +95,7 @@ export const VALIDATE_TOKEN = (token: string): TE.TaskEither<M.JAError, U.UserJW
     TE.chain(getPublicKey),
     TE.chain(publicKey =>
       pipe(
-        verifyJWT(token, publicKey),
+        verifyJWT(token, publicKey.replace(/\\n/gm, "\n")),
         TE.mapLeft(flow(String, M.unauthorizedError("Unauthorized"))),
         TE.chain(
           flow(

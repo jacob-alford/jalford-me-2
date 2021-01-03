@@ -98,7 +98,7 @@ interface EmailPassword {
   password: string;
 }
 
-export const decodeEmailPasswordHeaders = decodeHeaders<EmailPassword>(
+export const decodeEmailPasswordBody = decodeBody<EmailPassword>(
   D.type({ email: D.string, password: D.string })
 );
 

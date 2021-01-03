@@ -51,3 +51,6 @@ export const healthHandler = () => (_: Request, res: Response, __: NextFunction)
   res.status(200);
   res.json(M.generalSuccess("API Server is healthy")(undefined));
 };
+
+export const notFoundHandler = () => (req: Request, __: Response, next: NextFunction) =>
+  next(M.notFoundError("Not Found")(`Path not found: ${req.originalUrl}`));

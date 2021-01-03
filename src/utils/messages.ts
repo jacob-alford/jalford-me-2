@@ -13,8 +13,8 @@ export interface JAError {
 }
 
 export const decodeJAError: D.Decoder<unknown, JAError> = D.type({
-  status_code: D.literal("INTERNAL", "UNAUTHORIZED", "MALFORMED_INPUT"),
-  status_number: D.literal(500, 401, 400),
+  status_code: D.literal("INTERNAL", "UNAUTHORIZED", "MALFORMED_INPUT", "NOT_FOUND"),
+  status_number: D.literal(500, 401, 400, 404),
   error: D.string,
   message: D.string
 });

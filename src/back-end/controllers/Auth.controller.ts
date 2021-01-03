@@ -8,9 +8,9 @@ import * as M from "utils/messages";
 
 export const AUTH_LOGIN_POST = makeRequestHandler(
   flow(
-    RA.decodeEmailPasswordHeaders,
-    TE.chain(({ headers }) =>
-      AS.VALIDATE_EMAIL_PASSWORD(headers.value.password, headers.value.password)
+    RA.decodeEmailPasswordBody,
+    TE.chain(({ body }) =>
+      AS.VALIDATE_EMAIL_PASSWORD(body.value.email, body.value.password)
     ),
     TE.chain(user =>
       AS.GET_TOKENS(AS.ID_TOKEN_EXPIRATION, AS.REFRESH_TOKEN_EXPIRATION, user)

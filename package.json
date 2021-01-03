@@ -19,6 +19,7 @@
     "@types/sinon": "^9.0.10",
     "argon2": "^0.27.1",
     "axios": "^0.21.1",
+    "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-rate-limit": "^5.2.3",
@@ -37,7 +38,8 @@
     "web-vitals": "^0.2.4"
   },
   "scripts": {
-    "start:backend:dev": "nodemon -e ts --exec ts-node -r tsconfig-paths/register src/back-end",
+    "start:backend:dev": "nodemon -e ts --exec yarn start:backend",
+    "start:backend": "ts-node -P ./tsconfig.backend.json -r tsconfig-paths/register src/back-end",
     "migrate:dev": "prisma migrate dev --preview-feature --schema src/back-end/schema.prisma",
     "start": "react-scripts start",
     "build": "react-scripts build",
