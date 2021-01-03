@@ -143,19 +143,6 @@ export const decodeToken = <Nv, Bd, Hd, Pm>(
     }))
   );
 
-export const verifyJWT: (
-  token: string,
-  secretKey: string,
-  options?: jwt.VerifyOptions
-) => TE.TaskEither<unknown, unknown> = TE.taskify(
-  jwt.verify as (
-    token: string,
-    secret: string,
-    options?: jwt.DecodeOptions,
-    cb?: (err: unknown, token: unknown) => void
-  ) => void
-);
-
 type BearerAuth = string;
 
 interface AuthorizedHeaders {

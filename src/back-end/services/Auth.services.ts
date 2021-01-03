@@ -2,20 +2,44 @@ import * as TE from "fp-ts/lib/TaskEither";
 import { pipe, flow, identity } from "fp-ts/lib/function";
 import { sequenceT } from "fp-ts/lib/Apply";
 import * as D from "io-ts/lib/Decoder";
+import * as E from "fp-ts/lib/Either";
 import * as jwt from "jsonwebtoken";
-import axios from "axios";
 import { env } from "back-end/env";
 import * as U from "models/User";
 import * as US from "back-end/services/User.services";
 import * as M from "utils/messages";
+import * as X from "utils/X";
 
 const sequence = sequenceT(TE.taskEither);
+
+export interface Tokens {
+  id_token: string;
+  refresh_token: string;
+}
+
+export const verifyJWT: (
+  token: string,
+  publicKey: string,
+  options?: jwt.VerifyOptions
+) => TE.TaskEither<unknown, unknown> = TE.taskify(
+  jwt.verify as (
+    token: string,
+    publicKey: string,
+    options?: jwt.DecodeOptions,
+    cb?: (err: unknown, token: unknown) => void
+  ) => void
+);
+
+const getPublicKey = X.get(
+  D.string,
+  "Error retrieving public key!",
+  "Unexpected response format retrieving public key!"
+);
 
 interface KeyPassphrase {
   key: string;
   passphrase: string;
 }
-
 const signJWT: (
   payload: Omit<U.UserJWT, "sub">,
   keyPassphrase: KeyPassphrase,
@@ -29,32 +53,32 @@ const signJWT: (
   ) => void
 );
 
-const getPrivateKey = (url: string): TE.TaskEither<M.JAError, string> =>
+const getPrivateKey = X.get(
+  D.string,
+  "Error retrieving private key!",
+  "Unexpected response format retrieving private key!"
+);
+
+export const VALIDATE_ID_TOKEN = (
+  id_token: string
+): TE.TaskEither<M.JAError, U.UserJWT> =>
   pipe(
-    url,
-    TE.tryCatchK(
-      axios.get,
-      flow(String, M.internalError("Error retrieving private key!"))
-    ),
-    TE.chain(result =>
+    env.SIGNING_PUBLIC_KEY_URL,
+    TE.chain(getPublicKey),
+    TE.chain(publicKey =>
       pipe(
-        result.data,
-        D.string.decode,
-        TE.fromEither,
-        TE.mapLeft(
+        verifyJWT(id_token, publicKey),
+        TE.mapLeft(flow(String, M.unauthorizedError("Unauthorized"))),
+        TE.chain(
           flow(
-            D.draw,
-            M.internalError("Unexpected response format retrieving private key!")
+            U.decodeUserJWT.decode,
+            E.mapLeft(flow(D.draw, M.unauthorizedError("Unexpected malformed token"))),
+            TE.fromEither
           )
         )
       )
     )
   );
-
-export interface Tokens {
-  id_token: string;
-  refresh_token: string;
-}
 
 export const GET_TOKENS = (
   idTokenExpiresIn: string,
