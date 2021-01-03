@@ -47,8 +47,21 @@ const signJWT: (
   ) => void
 );
 
-export const PUBLIC_KEY =
-  "ecdsa-sha2-nistp521 AAAAE2VjZHNhLXNoYTItbmlzdHA1MjEAAAAIbmlzdHA1MjEAAACFBAEIBEqq2tKC6Ghdu5SPs2bPY6nHuoDj+XFl9zzCxUr03+LY2YE7Bcouv2hDZg9S/Q9u4WRGa8KxxtYYOUeiy0PZRQAuN9pqZVqUCyDcN7DAh/798A91eTAc4o6JUTFOrDWGny/7xd4UcH+aySWkP6BBTK44WJQzaEVfNUVJk7UY+X03UQ== jacob@fl-69-69-0-198.dhcp.embarqhsd.net";
+export const PUBLIC_KEY = `-----BEGIN PUBLIC KEY-----
+MIICXDCCAc8GByqGSM49AgEwggHCAgEBME0GByqGSM49AQECQgH/////////////
+////////////////////////////////////////////////////////////////
+/////////zCBngRCAf//////////////////////////////////////////////
+///////////////////////////////////////8BEFRlT65YY4cmh+SmiGgtoVA
+7qLacluZsxXzuLSJkY7xCeFWGTlR7H6TexZSwL07sb8HNXPfiD0sNPHvRR/Ua1A/
+AAMVANCeiAApHLhTlsxnFzkyhKqg2mS6BIGFBADGhY4GtwQE6c2ePstmI5W0Qpxk
+gTkFP7Uh+CivYGtNPbqhS1537+dZKP4dwSei/6jeM0izwYVqQpv5fn4xwuW9ZgEY
+OSlqeJo7wARcil+0LH0b2Zj1RElXm0RoF6+9Fyc+ZiyX7nKZXvQmQMVQuQE/rQdh
+NTxwhqJywkCIvpR2n9FmUAJCAf//////////////////////////////////////
+////+lGGh4O/L5Zrf8wBSPcJpdA7tcm4iZxHrrtvtx6ROGQJAgEBA4GGAAQBCARK
+qtrSguhoXbuUj7Nmz2Opx7qA4/lxZfc8wsVK9N/i2NmBOwXKLr9oQ2YPUv0PbuFk
+RmvCscbWGDlHostD2UUALjfaamValAsg3DewwIf+/fAPdXkwHOKOiVExTqw1hp8v
++8XeFHB/msklpD+gQUyuOFiUM2hFXzVFSZO1GPl9N1E=
+-----END PUBLIC KEY-----`;
 
 export const ID_TOKEN_EXPIRATION = "1h";
 export const REFRESH_TOKEN_EXPIRATION = "7d";
@@ -81,7 +94,7 @@ export const VALIDATE_EMAIL_PASSWORD = (
 
 export const VALIDATE_TOKEN = (token: string): TE.TaskEither<M.JAError, U.UserJWT> =>
   pipe(
-    verifyJWT(token, PUBLIC_KEY),
+    verifyJWT(token, PUBLIC_KEY, { algorithms: ["ES512"] }),
     TE.mapLeft(flow(String, M.unauthorizedError("Unauthorized"))),
     TE.chain(
       flow(
@@ -113,7 +126,8 @@ export const REFRESH_ID_TOKEN = (
       pipe(
         user,
         TE.tryCatchK(
-          ({ current_refresh_token }) => a2.verify(current_refresh_token, refresh_token),
+          ({ current_refresh_token }) =>
+            a2.verify(current_refresh_token, refresh_token, { type: a2.argon2id }),
           flow(String, M.internalError("Unable to verify refresh_token"))
         ),
         TE.chain(
@@ -173,12 +187,25 @@ export const GET_TOKENS = (
         ),
         TE.chain(tokens =>
           pipe(
+            tokens,
+            TE.tryCatchK(
+              ({ refresh_token }) => a2.hash(refresh_token, { type: a2.argon2id }),
+              flow(String, M.internalError("Unable to hash refresh_token!"))
+            ),
+            TE.map(hashed_refresh_token => ({
+              ...tokens,
+              hashed_refresh_token: hashed_refresh_token
+            }))
+          )
+        ),
+        TE.chain(({ id_token, refresh_token, hashed_refresh_token }) =>
+          pipe(
             US.updateById(id, {
               display_name,
               email,
-              current_refresh_token: tokens.refresh_token
+              current_refresh_token: hashed_refresh_token
             }),
-            TE.bimap(identity, () => tokens)
+            TE.bimap(identity, () => ({ id_token, refresh_token }))
           )
         )
       )

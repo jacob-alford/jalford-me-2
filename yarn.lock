@@ -5426,6 +5426,11 @@ forwarded@~0.1.2:
   resolved "https://registry.yarnpkg.com/forwarded/-/forwarded-0.1.2.tgz#98c23dab1175657b8c0573e8ceccd91b0ff18c84"
   integrity sha1-mMI9qxF1ZXuMBXPozszZGw/xjIQ=
 
+fp-ts-std@^0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/fp-ts-std/-/fp-ts-std-0.7.0.tgz#a343df926ba8c84fdfa2bafd3bf2fe6249cbae9e"
+  integrity sha512-aDk5XTPKehkVw5Lri74yzn2bHirlYujbLgbrwtdXzxTfBSYAoqB30mgJCYSgsJozOXGZVg2O23DrGvK4NwWHlw==
+
 fp-ts@^2.0.0:
   version "2.9.3"
   resolved "https://registry.yarnpkg.com/fp-ts/-/fp-ts-2.9.3.tgz#419b9103018ddf7c785acf2b3fecb2662afab5af"
