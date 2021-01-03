@@ -38,11 +38,13 @@ export const decodeCreateUser: D.Decoder<unknown, CreateUser> = D.type({
 export interface UpdateUser {
   email: string;
   display_name: string;
+  current_refresh_token: string | null;
 }
 
 export const decodeUpdateUser: D.Decoder<unknown, UpdateUser> = D.type({
   email: D.string,
-  display_name: D.string
+  display_name: D.string,
+  current_refresh_token: D.nullable(D.string)
 });
 
 export interface UserJWT {
