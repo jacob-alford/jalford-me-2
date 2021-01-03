@@ -44,3 +44,15 @@ export const decodeUpdateUser: D.Decoder<unknown, UpdateUser> = D.type({
   email: D.string,
   display_name: D.string
 });
+
+export interface UserJWT {
+  email: string;
+  sub: string;
+  display_name: string;
+}
+
+export const decodeUserJWT: D.Decoder<unknown, UserJWT> = D.type({
+  email: D.string,
+  sub: D.string,
+  display_name: D.string
+});

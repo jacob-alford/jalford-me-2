@@ -8,6 +8,7 @@ import * as jwt from "jsonwebtoken";
 import * as BHPT from "utils/BHPT";
 import * as M from "utils/messages";
 import * as Kn from "utils/knowledge";
+import * as U from "models/User";
 
 const SECRET_KEY = process.env.JWT_SECRET_KEY as string;
 
@@ -161,20 +162,8 @@ interface AuthorizedHeaders {
   Authorization: BearerAuth;
 }
 
-interface UserJWT {
-  email: string;
-  sub: string;
-  display_name: string;
-}
-
-const decodeUserJWT: D.Decoder<unknown, UserJWT> = D.type({
-  email: D.string,
-  sub: D.string,
-  display_name: D.string
-});
-
 export const validateJwt = decodeToken<
-  UserJWT,
+  U.UserJWT,
   Kn.Unknown,
   AuthorizedHeaders,
   Kn.Unknown
@@ -190,7 +179,7 @@ export const validateJwt = decodeToken<
     ),
     TE.bimap(String, Kn.unknown)
   )
-)(decodeUserJWT);
+)(U.decodeUserJWT);
 
 export const authorizeToken = <Tk, Bd, Hd, Pm>(
   validator: (bhpt: BHPT.BHPT<Bd, Hd, Pm, Kn.Known<Tk>>) => [boolean, string]
