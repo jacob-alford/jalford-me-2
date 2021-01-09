@@ -46,7 +46,7 @@
     "schema:gen": "prisma generate --schema src/back-end/schema.prisma",
     "migrate:dev": "prisma migrate dev --preview-feature --schema src/back-end/schema.prisma",
     "migrate:dev:reset": "prisma migrate reset --preview-feature --schema src/back-end/schema.prisma",
-    "migrate:prod": "primsa migrate deploy --preview-feature --schema src/back-end/schema.prisma",
+    "migrate:prod": "prisma migrate deploy --preview-feature --schema src/back-end/schema.prisma",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
