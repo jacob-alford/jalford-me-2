@@ -30,4 +30,4 @@ COPY --from=development /usr/src/app/dist ./dist
 
 EXPOSE 8080
 
-CMD ["yarn", "start:prod"]
+CMD ["yarn", "start:backend:prod"]
