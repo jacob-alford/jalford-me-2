@@ -1,5 +1,5 @@
-import { Comment as _Comment } from "@prisma/client";
 import * as D from "io-ts/lib/Decoder";
+import { Comment as _Comment } from "back-end/prisma-client";
 
 export type Comment = _Comment;
 

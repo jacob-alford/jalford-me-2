@@ -1,5 +1,5 @@
-import { User as _User } from "@prisma/client";
 import * as D from "io-ts/lib/Decoder";
+import { User as _User } from "back-end/prisma-client";
 
 export type User = _User;
 

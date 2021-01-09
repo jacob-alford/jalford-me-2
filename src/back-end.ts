@@ -1,6 +1,6 @@
 import express from "express";
 import * as bodyParser from "body-parser";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "back-end/prisma-client";
 import { router } from "back-end/router";
 import cors from "cors";
 import helmet from "helmet";
