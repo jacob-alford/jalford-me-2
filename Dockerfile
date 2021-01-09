@@ -2,9 +2,9 @@ FROM node:14-alpine As development
 
 WORKDIR /usr/src/app
 
-ADD ../../package.json ./
-ADD ../../yarn.lock ./
-ADD ../../tsconfig.backend.json ./
+ADD package.json ./
+ADD yarn.lock ./
+ADD tsconfig.backend.json ./
 
 RUN yarn install --frozen-lockfile --prod=false
 
