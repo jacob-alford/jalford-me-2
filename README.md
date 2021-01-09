@@ -13,8 +13,6 @@ This is some sort of dozenth iteration of my website. This time I've put the bac
 
 ## Examples:
 
-### Incredibly declarative / fully typed / functional:
-
 `src / back-end/ controllers / User.controller.ts`
 
 ```typescript
