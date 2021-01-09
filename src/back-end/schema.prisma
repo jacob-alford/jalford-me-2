@@ -17,9 +17,12 @@ model User {
 }
 
 model Comment {
-  id      String @id @default(cuid())
-  body    String
-  user    User   @relation(fields: [user_id], references: [id])
-  user_id String
-  post_id String
+  id             String    @id @default(cuid())
+  body           String
+  user           User      @relation(fields: [user_id], references: [id])
+  user_id        String
+  parent_id      String?
+  parent_comment Comment?  @relation(fields: [parent_id], references: [id])
+  child_comments Comment[] @relation("CommentToComment")
+  post_id        String
 }

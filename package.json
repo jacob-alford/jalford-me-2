@@ -39,9 +39,13 @@
     "web-vitals": "^0.2.4"
   },
   "scripts": {
-    "start:backend:dev": "nodemon -e ts --exec yarn start:backend",
-    "start:backend": "ts-node -P ./tsconfig.backend.json -r tsconfig-paths/register src/back-end",
+    "start:backend:watch": "nodemon -e ts --exec yarn start:backend:dev",
+    "start:backend:dev": "ts-node -P ./tsconfig.backend.json -r tsconfig-paths/register src/back-end",
+    "start:backend:prod": "node dist/src/back-end",
+    "schema:gen": "prisma generate --schema src/back-end/schema.prisma",
     "migrate:dev": "prisma migrate dev --preview-feature --schema src/back-end/schema.prisma",
+    "migrate:dev:reset": "prisma migrate reset --preview-feature --schema src/back-end/schema.prisma",
+    "migrate:prod": "primsa migrate deploy --preview-feature --schema src/back-end/schema.prisma",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
