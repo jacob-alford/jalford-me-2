@@ -4,14 +4,11 @@ import * as E from "fp-ts/lib/Either";
 import * as D from "io-ts/lib/Decoder";
 import * as A from "fp-ts/lib/Array";
 import * as O from "fp-ts/lib/Option";
-import * as jwt from "jsonwebtoken";
 import * as AS from "back-end/services/Auth.services";
 import * as BHPT from "utils/BHPT";
 import * as M from "utils/messages";
 import * as Kn from "utils/knowledge";
 import * as U from "models/User";
-
-const SECRET_KEY = process.env.JWT_SECRET_KEY as string;
 
 export type ReqArgs<Bd, Hd, Pm, Tk> = TE.TaskEither<M.JAError, BHPT.BHPT<Bd, Hd, Pm, Tk>>;
 
@@ -61,7 +58,7 @@ export const decodeHeaders = <Nv, Bd = Kn.Unknown, Pm = Kn.Unknown, Tk = Kn.Unkn
 const jwtIsValid = (jwt: string): boolean => pipe(jwt.split("."), a => a.length === 3);
 
 const decodeHeadersWithAuthorization: D.Decoder<unknown, AuthorizedHeaders> = D.type({
-  Authorization: pipe(
+  authorization: pipe(
     D.string,
     D.refine(
       (auth): auth is BearerAuth =>
@@ -145,7 +142,7 @@ export const decodeToken = <Nv, Bd, Hd, Pm>(
 type BearerAuth = string;
 
 interface AuthorizedHeaders {
-  Authorization: BearerAuth;
+  authorization: BearerAuth;
 }
 
 export const validateJwt = decodeToken<
@@ -155,7 +152,7 @@ export const validateJwt = decodeToken<
   Kn.Unknown
 >(({ headers }) =>
   pipe(
-    headers.value.Authorization.split(" "),
+    headers.value.authorization.split(" "),
     A.lookup(1),
     O.fold(() => "", identity),
     AS.VALIDATE_TOKEN
