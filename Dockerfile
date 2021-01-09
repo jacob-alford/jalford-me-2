@@ -13,8 +13,6 @@ COPY . .
 RUN yarn schema:gen
 RUN yarn build:backend
 
-COPY src/back-end/prisma-client dist/back-end/prisma-client
-
 FROM node:14-alpine As production
 
 ARG NODE_ENV=production
