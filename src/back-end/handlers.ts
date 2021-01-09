@@ -43,7 +43,7 @@ export const errorHandler = () => (
       error => {
         console.error(error);
         res.status(error.status_number);
-        res.json(M.internalError("Internal Error")(error.message));
+        res.json(error);
       }
     )
   );

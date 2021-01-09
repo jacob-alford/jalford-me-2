@@ -29,7 +29,7 @@ export const notFoundError = (message: string) => (error: string): JAError => ({
 export const internalError = (message: string) => (error: string): JAError => ({
   status_code: "INTERNAL",
   status_number: 500,
-  error,
+  error: "Internal Error",
   message
 });
 
