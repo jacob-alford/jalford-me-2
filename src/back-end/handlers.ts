@@ -36,13 +36,14 @@ export const errorHandler = () => (
     M.decodeJAError.decode,
     E.fold(
       () => {
-        console.log(err);
+        console.error(err);
         res.status(500);
-        res.json(M.internalError("Internal Error")(String(err)));
+        res.json(M.internalError("Internal Error")("Internal Error"));
       },
       error => {
+        console.error(error);
         res.status(error.status_number);
-        res.json(error);
+        res.json(M.internalError("Internal Error")(error.message));
       }
     )
   );
