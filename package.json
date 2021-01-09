@@ -42,7 +42,7 @@
     "start:backend:watch": "nodemon -e ts --exec yarn start:backend:dev",
     "start:backend:dev": "ts-node -P ./tsconfig.backend.json -r tsconfig-paths/register src/back-end",
     "start:backend:prod": "NODE_PATH=./dist node dist/back-end.js",
-    "build:backend": "rimraf dist && tsc -p ./tsconfig.backend.json && copyfiles -V -u 3 src/back-end/prisma-client/* dist/back-end/prisma-client",
+    "build:backend": "rimraf dist && tsc -p ./tsconfig.backend.json && copyfiles -V -u 3 src/back-end/prisma-client/* src/back-end/prisma-client/runtime/* dist/back-end/prisma-client",
     "schema:gen": "prisma generate --schema src/back-end/schema.prisma",
     "migrate:dev": "prisma migrate dev --preview-feature --schema src/back-end/schema.prisma",
     "migrate:dev:reset": "prisma migrate reset --preview-feature --schema src/back-end/schema.prisma",
