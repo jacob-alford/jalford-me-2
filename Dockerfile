@@ -10,7 +10,7 @@ RUN yarn install --frozen-lockfile --prod=false
 
 COPY . .
 
-RUN yarn build
+RUN yarn build:backend
 RUN yarn schema:gen
 
 FROM node:14-alpine As production
