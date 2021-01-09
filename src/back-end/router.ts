@@ -1,10 +1,9 @@
-import express from "express";
+import { Router } from "express";
 import * as UC from "back-end/controllers/User.controller";
 import * as CC from "back-end/controllers/Comment.controller";
 import * as AC from "back-end/controllers/Auth.controller";
 
-export const router = express
-  .Router()
+export const router = Router()
   /*
    * Auth Routes
    */

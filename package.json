@@ -41,8 +41,8 @@
   "scripts": {
     "start:backend:watch": "nodemon -e ts --exec yarn start:backend:dev",
     "start:backend:dev": "ts-node -P ./tsconfig.backend.json -r tsconfig-paths/register src/back-end",
-    "start:backend:prod": "node dist/src/back-end",
-    "build:backend": "tsc -p ./tsconfig.backend.json",
+    "start:backend:prod": "NODE_PATH=./dist node dist/back-end.js",
+    "build:backend": "rimraf dist && tsc -p ./tsconfig.backend.json",
     "schema:gen": "prisma generate --schema src/back-end/schema.prisma",
     "migrate:dev": "prisma migrate dev --preview-feature --schema src/back-end/schema.prisma",
     "migrate:dev:reset": "prisma migrate reset --preview-feature --schema src/back-end/schema.prisma",
@@ -84,6 +84,7 @@
   "devDependencies": {
     "@prisma/cli": "^2.13.1",
     "nodemon": "^2.0.6",
+    "rimraf": "^3.0.2",
     "ts-node": "^9.1.1",
     "tsconfig-paths": "^3.9.0"
   }
