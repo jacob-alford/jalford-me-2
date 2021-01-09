@@ -4,13 +4,14 @@ WORKDIR /usr/src/app
 
 ADD package.json ./
 ADD yarn.lock ./
-ADD tsconfig.build.json ./
+ADD tsconfig.backend.json ./
 
 RUN yarn install --frozen-lockfile --prod=false
 
 COPY . .
 
 RUN yarn build
+RUN yarn schema:gen
 
 FROM node:14-alpine As production
 

@@ -26,4 +26,4 @@ export const app = express()
   .use("*", H.notFoundHandler())
   .use(H.errorHandler());
 
-app.listen(3000, () => console.log("App listening on port 3000"));
+app.listen(8080, () => console.log("App listening on port 3000"));
