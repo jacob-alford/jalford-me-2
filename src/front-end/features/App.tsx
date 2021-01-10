@@ -1,22 +1,13 @@
-import React from "react";
-import "./App.css";
+import { Header } from "front-end/components/Header";
+import { S } from "front-end/utils/S";
+import { Layout } from "front-end/components/Layout";
+import { QuickLinks } from "front-end/components/QuickLinks";
 
-export const App = () => (
-  <div className="App">
-    <header className="App-header">
-      <p>
-        Edit <code>src/App.tsx</code> and save to reload.
-      </p>
-      <a
-        className="App-link"
-        href="https://reactjs.org"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        Learn React
-      </a>
-    </header>
-  </div>
-);
+export const App = S(() => (
+  <Layout>
+    <QuickLinks />
+    <Header />
+  </Layout>
+));
 
 export default App;
