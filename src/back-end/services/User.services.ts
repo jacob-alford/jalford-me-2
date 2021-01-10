@@ -58,6 +58,23 @@ export const findByEmail = (email: string): TE.TaskEither<M.JAError, User> =>
     )
   );
 
+export const updateRefreshTokenById = (
+  user_id: string,
+  refresh_token: string
+): TE.TaskEither<M.JAError, M.JASuccess<User>> =>
+  pipe(
+    user_id,
+    TE.tryCatchK(
+      id =>
+        prisma.user.update({
+          where: { id },
+          data: { current_refresh_token: refresh_token }
+        }),
+      flow(String, M.malformedInputError(`Unable to find user with id: ${user_id}`))
+    ),
+    TE.map(M.successfulUpdate(`Successfully updated user with id: ${user_id}`))
+  );
+
 export const updateById = (
   user_id: string,
   data: UpdateUser

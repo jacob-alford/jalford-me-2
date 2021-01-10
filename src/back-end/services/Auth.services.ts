@@ -200,11 +200,7 @@ export const GET_TOKENS = (
         ),
         TE.chain(({ id_token, refresh_token, hashed_refresh_token }) =>
           pipe(
-            US.updateById(id, {
-              display_name,
-              email,
-              current_refresh_token: hashed_refresh_token
-            }),
+            US.updateRefreshTokenById(id, hashed_refresh_token),
             TE.bimap(identity, () => ({ id_token, refresh_token }))
           )
         )
