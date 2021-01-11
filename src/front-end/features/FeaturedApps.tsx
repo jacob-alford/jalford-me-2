@@ -3,8 +3,14 @@ import Typography from "@material-ui/core/Typography";
 import { S } from "front-end/utils/S";
 import { AppIcon } from "front-end/components/AppIcon";
 import { PageTitle } from "front-end/components/PageTitle";
-import DS from "front-end/assets/duncan-strauss.png";
 import { Card } from "front-end/components/Card";
+import { C } from "front-end/styles/C";
+import localLibrary from "front-end/assets/mui-local-library-sharp.svg";
+import libraryBook from "front-end/assets/mui-library-book-sharp.svg";
+import extension from "front-end/assets/mui-extension-sharp.svg";
+import dialpad from "front-end/assets/mui-horizontal-split-sharp.svg";
+import school from "front-end/assets/mui-school-sharp.svg";
+import work from "front-end/assets/mui-work-sharp.svg";
 
 interface App {
   label: string;
@@ -23,96 +29,72 @@ const featuredApps = [
     "Mystery Novel",
     "/duncan-strauss",
     <AppIcon
-      background="#F9D8A7"
+      background={C.container}
       onClick={() => {}}
       width={75}
       height={75}
-      src={DS}
+      src={localLibrary}
       alt="Duncan Struass Mysteries"
     />
   ),
   app(
-    "Mystery Novel",
-    "/duncan-strauss",
+    "Posts",
+    "/posts",
     <AppIcon
-      background="#F9D8A7"
+      background={C.container}
       onClick={() => {}}
       width={75}
       height={75}
-      src={DS}
-      alt="Duncan Struass Mysteries"
+      src={libraryBook}
+      alt="Posts"
     />
   ),
   app(
-    "Mystery Novel",
-    "/duncan-strauss",
+    "Puzzles",
+    "/puzzles",
     <AppIcon
-      background="#F9D8A7"
+      background={C.container}
       onClick={() => {}}
       width={75}
       height={75}
-      src={DS}
-      alt="Duncan Struass Mysteries"
+      src={extension}
+      alt="Puzzles"
     />
   ),
   app(
-    "Mystery Novel",
-    "/duncan-strauss",
+    "RPN Calculator",
+    "/rpn",
     <AppIcon
-      background="#F9D8A7"
+      background={C.container}
       onClick={() => {}}
       width={75}
       height={75}
-      src={DS}
-      alt="Duncan Struass Mysteries"
+      src={dialpad}
+      alt="RPN Calculator"
     />
   ),
   app(
-    "Mystery Novel",
-    "/duncan-strauss",
+    "Academic Papers",
+    "/academic-papers",
     <AppIcon
-      background="#F9D8A7"
+      background={C.container}
       onClick={() => {}}
       width={75}
       height={75}
-      src={DS}
-      alt="Duncan Struass Mysteries"
+      src={school}
+      alt="Academic Papers"
     />
   ),
   app(
-    "Mystery Novel",
-    "/duncan-strauss",
+    "Hire Me",
+    "/hire",
     <AppIcon
-      background="#F9D8A7"
+      background={C.container}
       onClick={() => {}}
       width={75}
       height={75}
-      src={DS}
-      alt="Duncan Struass Mysteries"
-    />
-  ),
-  app(
-    "Mystery Novel",
-    "/duncan-strauss",
-    <AppIcon
-      background="#F9D8A7"
-      onClick={() => {}}
-      width={75}
-      height={75}
-      src={DS}
-      alt="Duncan Struass Mysteries"
-    />
-  ),
-  app(
-    "Mystery Novel",
-    "/duncan-strauss",
-    <AppIcon
-      background="#F9D8A7"
-      onClick={() => {}}
-      width={75}
-      height={75}
-      src={DS}
-      alt="Duncan Struass Mysteries"
+      src={work}
+      alt="Hire Me"
     />
   )
 ];
@@ -159,16 +141,16 @@ export const FeaturedApps = S(() => (
   <FeaturedAppsContainer>
     <PageTitle>Apps</PageTitle>
     <CardContainer>
-      <Card>
-        <FeaturedAppsCardContainer>
-          {featuredApps.map(({ label, icon, id }) => (
-            <LabeledIcon key={id}>
-              {icon}
-              <Typography variant="caption">{label}</Typography>
-            </LabeledIcon>
-          ))}
-        </FeaturedAppsCardContainer>
-      </Card>
+      <FeaturedAppsCardContainer>
+        {featuredApps.map(({ label, icon, id }) => (
+          <LabeledIcon key={id}>
+            {icon}
+            <Typography align="center" variant="caption">
+              {label}
+            </Typography>
+          </LabeledIcon>
+        ))}
+      </FeaturedAppsCardContainer>
     </CardContainer>
   </FeaturedAppsContainer>
 ));

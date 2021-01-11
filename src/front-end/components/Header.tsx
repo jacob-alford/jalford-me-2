@@ -48,6 +48,12 @@ const TextBlock = styled.div`
 
 const Name = styled(Typography)`
   color: ${C.text_constructor} !important;
+  @media (max-width: 608px) {
+    margin-right: 0px !important;
+  }
+  @media (min-width: 609px) {
+    margin-right: -12px !important;
+  }
 `;
 
 const LinkUrl = styled(Typography)`
@@ -57,6 +63,21 @@ const LinkUrl = styled(Typography)`
 
 const Description = styled(Typography)`
   max-width: 421px;
+  @media (max-width: 608px) {
+    margin-right: 0px !important;
+  }
+  @media (min-width: 609px) {
+    margin-right: -8px !important;
+  }
+`;
+
+const VsCodeLink = styled(Link)`
+  @media (max-width: 608px) {
+    margin-right: 0px !important;
+  }
+  @media (min-width: 609px) {
+    margin-right: -20px !important;
+  }
 `;
 
 export const Header = S(() => {
@@ -83,9 +104,9 @@ export const Header = S(() => {
         <Description variant="body1" gutterBottom>
           Full Stack • Mathematics • Design • Writing
         </Description>
-        <Link href={VSCODE_THEME} variant="body2">
+        <VsCodeLink href={VSCODE_THEME} variant="body2">
           Get this VS Code theme
-        </Link>
+        </VsCodeLink>
       </TextBlock>
       <Me
         style={meImgStyles}
