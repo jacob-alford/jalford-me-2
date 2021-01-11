@@ -99,7 +99,7 @@ export const Header = S(() => {
       <TextBlock>
         <Name variant="h1">Jacob Alford</Name>
         <LinkUrl variant="h2" gutterBottom>
-          jalf.io
+          me@jalf.io
         </LinkUrl>
         <Description variant="body1" gutterBottom>
           Full Stack • Mathematics • Design • Writing
