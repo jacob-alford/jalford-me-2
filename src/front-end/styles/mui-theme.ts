@@ -84,7 +84,7 @@ export const muiTheme = createMuiTheme({
         color: C.text_secondary
       },
       caption: {
-        color: "#fff"
+        color: C.text_secondary
       },
       button: {
         color: "#00ff00"
