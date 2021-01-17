@@ -17,7 +17,7 @@ const Container = styled.div`
 `;
 
 interface PageContainerProps {
-  children: JSX.Element;
+  children: Array<JSX.Element>;
 }
 
 const pageContainerEq: Eq.Eq<PageContainerProps> = Eq.getStructEq({

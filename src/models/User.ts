@@ -1,4 +1,5 @@
 import * as D from "io-ts/lib/Decoder";
+import * as Eq from "fp-ts/lib/Eq";
 import { User as _User } from "back-end/prisma-client";
 
 export type User = _User;
@@ -53,4 +54,10 @@ export const decodeUserJWT: D.Decoder<unknown, UserJWT> = D.type({
   email: D.string,
   sub: D.string,
   display_name: D.string
+});
+
+export const eqUserJWT: Eq.Eq<UserJWT> = Eq.getStructEq({
+  email: Eq.eqString,
+  sub: Eq.eqString,
+  display_name: Eq.eqString
 });
